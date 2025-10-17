@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  ORGANIZER
+  USER
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+model User{
+  id String @id @default(cuid())
+  name String?
+  email String @unique
+  password String? 
+  image String?
+  role Role @default(USER)
+  createdAt DateTime @default(now())
+
+  
+  //relations
+  events Event[] @relation("CreatorEvents")
+  bookings Booking[]
+}
+
+model Category{
+  id String @id @default(cuid())
+  name String
+  createdAt DateTime @default(now())
+
+  events Event[]
+}
+
+model Event{
+  id String @id @default(cuid())
+  title String
+  description String?
+  date DateTime
+  time DateTime?
+  location String?
+  capacity Int
+  createdAt DateTime @default(now())
+
+  createdById String
+  creator User @relation("CreatorEvents",fields: [createdById],references: [id])
+
+  categoryId String
+  category Category @relation(fields: [categoryId],references: [id])
+
+  bookings Booking[]
+}
+
+model Booking{
+  id String @id @default(cuid())
+  userId String
+  user User @relation(fields: [userId],references: [id])
+  eventId String
+  event Event @relation(fields: [eventId],references: [id])
+  status BookingStatus @default(CONFIRMED)
+  createdAt DateTime @default(now())
+  @@unique([userId,eventId])
+}
