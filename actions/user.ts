@@ -74,3 +74,8 @@ export async function getRole(){
   const role=session?.user.role
   return role;
 }
+
+
+export async function signInWithGoogle(){
+  await signIn('google')
+}

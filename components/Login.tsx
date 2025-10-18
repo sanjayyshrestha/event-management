@@ -17,7 +17,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "./ui/tabs";
-import { login, registerUser } from "@/actions/user";
+import { login, registerUser, signInWithGoogle } from "@/actions/user";
 import toast from "react-hot-toast";
 import { redirect } from "next/navigation";
 
@@ -70,8 +70,13 @@ export function Login() {
   };
 
   const handleGoogleSignIn = async () => {
-    
-    
+
+    try {
+      await signInWithGoogle()
+      redirect('/')
+    } catch (error) {
+      console.log('Error signing with google : ',error)
+    }
   };
 
   return (

@@ -65,7 +65,39 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
 
     signIn:async({user,account})=>{
+      if(account?.provider==='google'){
+        try {
+          const {email,name,image,role} =user
 
+          if(!email){
+            throw new Error("Email is required")
+            return false
+          }
+          const existingUser=await prisma.user.findUnique({
+            where:{email}
+          })
+
+          if(existingUser){
+            user.id=existingUser.id
+            user.role=existingUser.role
+          }else{
+            const newUser=await prisma.user.create({
+              data:{
+                email,
+                name,
+                image,
+              }
+            })
+            user.id=newUser.id
+            user.role=newUser.role
+          }
+
+          return true
+        } catch (error) {
+          console.log('Error signing in with google : ',error)
+          return false;
+        }
+      }
       if(account?.provider==='credentials'){
         return true
       }

@@ -165,3 +165,31 @@ export async function deleteEvent(eventId:string){
       message:"Event deleted successfully"
     }
 }
+
+export async function getUserBookings(){
+  const userId=await getLoggedInUserId();
+
+const userBookings= await prisma.event.findMany({
+  where:{
+    bookings:{
+      some:{
+        userId,
+        status:'CONFIRMED'
+      }
+    }
+  },
+  include: {
+      category: {
+        select: {
+          name: true,
+        },
+      },
+      _count:{
+        select:{
+          bookings:true
+        }
+      }
+    },
+ })
+ return userBookings
+}
