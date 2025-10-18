@@ -59,10 +59,10 @@ model Event{
   createdAt DateTime @default(now())
 
   createdById String
-  creator User @relation("CreatorEvents",fields: [createdById],references: [id])
+  creator User @relation("CreatorEvents",fields: [createdById],references: [id],onDelete:Cascade)
 
   categoryId String
-  category Category @relation(fields: [categoryId],references: [id])
+  category Category @relation(fields: [categoryId],references: [id],onDelete:Cascade)
 
   bookings Booking[]
 }
@@ -70,9 +70,9 @@ model Event{
 model Booking{
   id String @id @default(cuid())
   userId String
-  user User @relation(fields: [userId],references: [id])
+  user User @relation(fields: [userId],references: [id],onDelete:Cascade)
   eventId String
-  event Event @relation(fields: [eventId],references: [id])
+  event Event @relation(fields: [eventId],references: [id],onDelete:Cascade)
   status BookingStatus @default(CONFIRMED)
   createdAt DateTime @default(now())
   @@unique([userId,eventId])

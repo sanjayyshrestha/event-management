@@ -69,8 +69,8 @@ export function Login() {
   
   };
 
-  const handleGoogleSignIn = () => {
-    // Demo: Log in as a regular user
+  const handleGoogleSignIn = async () => {
+    
     
   };
 

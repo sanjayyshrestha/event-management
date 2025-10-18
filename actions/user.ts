@@ -1,6 +1,6 @@
 'use server'
 
-import { signIn } from "@/auth"
+import { auth, signIn } from "@/auth"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { redirect } from "next/navigation"
@@ -54,4 +54,23 @@ export const login=async(formData:FormData)=>{
   }
 
   redirect('/')
+}
+
+
+export async function getLoggedInUser(){
+  const session=await auth();
+  const user=session?.user
+  return user;
+}
+
+export async function getLoggedInUserId(){
+  const session=await auth();
+  const userId=session?.user.id;
+  return userId
+}
+
+export async function getRole(){
+  const session=await auth();
+  const role=session?.user.role
+  return role;
 }
