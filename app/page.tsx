@@ -16,9 +16,7 @@ import { useEffect } from "react";
 
 export default async function Home() {
   const user=await getLoggedInUser()
-
   const events:Events=await getAllEvents()
-  console.log(events[0])
   return (
    <div>
     <DiscoverEvents events={events}  user={user}/>

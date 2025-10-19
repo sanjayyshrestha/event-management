@@ -79,3 +79,27 @@ export async function getRole(){
 export async function signInWithGoogle(){
   await signIn('google')
 }
+
+export async function getUserBookingList(){
+  
+ const userBookings= await prisma.booking.findMany({
+  
+    include:{
+      user:{
+        select:{
+          name:true,
+          email:true
+        }
+      },
+      event:{
+        select:{
+          title:true,
+          date:true,
+          location:true,
+        }
+      }
+    }
+  })
+
+  return userBookings
+}

@@ -193,3 +193,14 @@ const userBookings= await prisma.event.findMany({
  })
  return userBookings
 }
+
+export async function updateBookingStatus(bookingId:string,status:'CONFIRMED' | 'PENDING' | 'CANCELLED'){
+  await prisma.booking.update({
+    where:{id:bookingId},
+    data:{
+      status
+    }
+  })
+
+  revalidatePath('/user-bookings')
+}
