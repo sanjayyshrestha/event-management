@@ -72,23 +72,31 @@ const BookingButton = ({
           )}
           {status === "CONFIRMED" && (
             <Button
+            variant='outline'
               type="submit"
-              className="w-full h-11 bg-emerald-600 text-white font-medium hover:bg-emerald-700 shadow-sm"
+              className="w-full h-11 bg-white text-gray-900 border border-gray-300 hover:bg-gray-50"
             >
-              <Check className="w-4 h-4 mr-2" />
-              Confirmed
+              Cancel Booking
             </Button>
           )}
           {status === "CANCELLED" && (
+            <div className="flex flex-col">
             <Button
-              variant="outline"
-              disabled
-              className="w-full h-11 bg-gray-50 border-gray-300 text-gray-600 font-medium hover:bg-gray-50 cursor-not-allowed"
-            >
-              <X className="w-4 h-4 mr-2" />
-              Cancelled
-            </Button>
+          disabled={isFull}
+          type="submit"
+          className={`w-full h-11 font-medium transition-all ${
+            isFull
+              ? "bg-gray-100 text-gray-500 border border-gray-200 cursor-not-allowed hover:bg-gray-100"
+              : "bg-gray-900 text-white hover:bg-gray-800 shadow-sm"
+          }`}
+        >
+          {isFull ? "Fully Booked" : "Book Now"}
+        </Button>
+        <p className="text-sm  italic text-red-400 mt-2 ">You previously cancelled this booking</p>
+        </div>
+        
           )}
+
         </>
       )}
     </form>

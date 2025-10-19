@@ -180,7 +180,9 @@ const userBookings= await prisma.event.findMany({
     bookings:{
       some:{
         userId,
-        status:'CONFIRMED'
+        status:{
+         in:['CONFIRMED','PENDING']
+        }
       }
     }
   },
