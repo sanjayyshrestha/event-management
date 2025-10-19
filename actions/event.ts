@@ -33,12 +33,19 @@ const dateTime = new Date(dateTimeString);
 }
 
 export async function getAllEvents() {
+  const userId=await getLoggedInUserId();
   const events = await prisma.event.findMany({
     include: {
       category: {
         select: {
           name: true,
         },
+      },
+      bookings:{
+        where:{userId},
+        select:{
+          status:true
+        }
       },
       _count:{
         select:{
@@ -50,7 +57,6 @@ export async function getAllEvents() {
 
   return events;
 }
-
 
 export  async function getSpecificEvent(eventId:string){
  const event=await prisma.event.findUnique({
@@ -145,7 +151,7 @@ export async function toggleBooking(eventId:string){
 revalidatePath('/')
      return {
       success:true,
-      message:"Event booked successfully"
+      message:"Your booking is pending approval. You will be notified once it's confirmed."
     }
   }
   
@@ -188,7 +194,13 @@ const userBookings= await prisma.event.findMany({
         select:{
           bookings:true
         }
-      }
+      },
+            bookings:{
+        where:{userId},
+        select:{
+          status:true
+        }
+      },
     },
  })
  return userBookings

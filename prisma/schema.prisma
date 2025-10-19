@@ -73,7 +73,7 @@ model Booking{
   user User @relation(fields: [userId],references: [id],onDelete:Cascade)
   eventId String
   event Event @relation(fields: [eventId],references: [id],onDelete:Cascade)
-  status BookingStatus @default(CONFIRMED)
+  status BookingStatus @default(PENDING)
   createdAt DateTime @default(now())
   @@unique([userId,eventId])
 }

@@ -27,6 +27,8 @@ const EventCard = ({events,user}:{
       {events.map(async (event) => {
             const isFull = event._count.bookings >= event.capacity;
             const isBookingDone = await isBooked(event.id);
+            const userBooking=event.bookings[0];
+            const bookingstatus=userBooking?.status
             return (
               <Card
                 key={event.id}
@@ -86,6 +88,7 @@ const EventCard = ({events,user}:{
                     <EventAdminControls eventId={event.id}/>
                     
                   ) :  <BookingButton
+                     status={bookingstatus}
                       user={user}
                       isFull={isFull}
                       isBookingDone={isBookingDone}
