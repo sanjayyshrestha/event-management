@@ -5,7 +5,7 @@ import { toggleBooking } from "@/actions/event";
 import toast from "react-hot-toast";
 import { redirect } from "next/navigation";
 import { Status } from "@/types/status";
-import { Check, Clock, Lock, X } from "lucide-react";
+import { Clock, Lock, X } from "lucide-react";
 
 const BookingButton = ({
   status,

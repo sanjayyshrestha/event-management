@@ -68,6 +68,9 @@ export  async function getSpecificEvent(eventId:string){
      }
     
     },
+     bookings: {
+      select: { status: true }, // include the bookings array with only status
+    },
     _count:{
       select:{
         bookings:true

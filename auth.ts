@@ -2,6 +2,7 @@ import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import Google from "next-auth/providers/google"
 import { prisma } from "./lib/prisma"
+import bcrypt from "bcryptjs"
  
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [Google,
@@ -28,6 +29,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         if(!user) throw new Error('Invalid email or password')
 
+           const isPasswordValid = await bcrypt.compare(password, user.password!);
+  if (!isPasswordValid) throw new Error('Invalid email or password');
           const userData={
             id:user.id,
             name:user.name,
@@ -76,6 +79,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const existingUser=await prisma.user.findUnique({
             where:{email}
           })
+
+          
 
           if(existingUser){
             user.id=existingUser.id

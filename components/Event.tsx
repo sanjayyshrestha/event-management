@@ -1,7 +1,6 @@
 import React from "react";
-import { Calendar, MapPin, Users, Filter, Grid3x3, List } from "lucide-react";
+import { Calendar, Filter, Grid3x3, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import type { Events } from "@/app/page";
 import {
   Select,
@@ -10,19 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { isBooked, toggleBooking } from "@/actions/event";
-import BookingButton from "./BookingButton";
 
-import EventAdminControls from "./EventAdminControls";
 import EventCard from "./EventCard";
 
 export default function DiscoverEvents({

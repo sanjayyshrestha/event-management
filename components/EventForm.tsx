@@ -201,15 +201,19 @@ export function EventFormPage({event}:{
                     <Users className="h-4 w-4" />
                     Capacity
                   </Label>
-                  <Input
-                    id="capacity"
-                    type="number"
-                    min="1"
-                    value={formData.capacity}
-                    onChange={(e) => handleChange("capacity", parseInt(e.target.value))}
-                    required
-                    className="bg-input-background"
-                  />
+                 <Input
+  id="capacity"
+  type="number"
+  min="1"
+  value={formData.capacity ?? ""} // empty string if undefined
+  onChange={(e) => {
+    const value = e.target.value;
+    handleChange("capacity", value === "" ? "" : parseInt(value));
+  }}
+  required
+  className="bg-input-background"
+/>
+
                 </div>
               </div>
 
