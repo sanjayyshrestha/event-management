@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { ShieldCheck, UserCog, UserMinus } from "lucide-react";
-import type { Users } from "@/app/(admin)/dashboard/users/page";
+import type { Users } from "@/app/(admin)/admin/dashboard/users/page";
 import { Role } from "@/types/status";
 import {  updateUserRole } from "@/actions/user";
 

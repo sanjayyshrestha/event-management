@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { Booking, Bookings } from "@/app/(admin)/user-bookings/page";
+import type { Booking, Bookings } from "@/app/(admin)/admin/dashboard/user-bookings/page";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { updateBookingStatus } from "@/actions/event";
 const AdminUserBookingsTable = ({ bookings }: { bookings: Booking[] }) => {

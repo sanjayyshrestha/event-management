@@ -14,6 +14,7 @@ import EventAdminControls from './EventAdminControls';
 import type { Events } from "@/app/page";
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
+import EventOrganizerControl from './EventOrganizerControl';
 const EventCard = ({events,user}:{
   events:Events;
   user:{
@@ -84,16 +85,22 @@ const EventCard = ({events,user}:{
                 </CardContent>
 
                 <CardFooter className="pt-0">
-                  {user?.role === "ADMIN" ? (
-                    <EventAdminControls eventId={event.id}/>
-                    
-                  ) :  <BookingButton
-                     status={bookingstatus}
-                      user={user}
-                      isFull={isFull}
-                      isBookingDone={isBookingDone}
-                      eventId={event.id}
-                    />}
+                 {user?.role === "ADMIN" ? (
+  <EventAdminControls eventId={event.id} />
+) : user?.role === "ORGANIZER" && event.createdById === user.id ? (
+  // Organizer viewing their own event
+  <EventOrganizerControl eventId={event.id} />
+) : (
+  // Regular user booking
+  <BookingButton
+    status={bookingstatus}
+    user={user}
+    isFull={isFull}
+    isBookingDone={isBookingDone}
+    eventId={event.id}
+  />
+)}
+
                 </CardFooter>
               </Card>
             );

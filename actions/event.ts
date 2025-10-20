@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getLoggedInUserId, getRole } from "./user";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { Role } from "@/types/status";
 
 export async function createEvent(formData: FormData) {
   const creatorId = await getLoggedInUserId();
@@ -84,6 +85,27 @@ export  async function getSpecificEvent(eventId:string){
 }
 
 export async function updateEvent(formData:FormData,eventId:string){
+   const role: Role = await getRole();
+  const userId = await getLoggedInUserId(); // fetch the current user ID
+
+  if (role !== "ADMIN" && role !== "ORGANIZER") {
+    throw new Error("Unauthorized");
+  }
+
+  // Fetch the event to check ownership
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    select: { createdById: true },
+  });
+
+  if (!event) {
+    throw new Error("Event not found");
+  }
+
+  // Organizer can only edit their own event
+  if (role === "ORGANIZER" && event.createdById !== userId) {
+    throw new Error("Unauthorized: You cannot edit someone else's event");
+  }
   const title = formData.get("title") as string;
   const description = formData.get("description") as string;
   const categoryId=formData.get('category') as string

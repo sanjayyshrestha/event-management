@@ -20,15 +20,14 @@ export default async function Navbar() {
 
   const adminLinks = [
     ...baseLinks,
-    {name:'User bookings',href:'/user-bookings'},
-    { name: "User Management", href: "/users" },
-    { name: "Create Event", href: "/create-event" },
+    {name:'Dashboard',href:'/admin/dashboard'},
+    
   ];
 
   const organizerLinks = [
     ...baseLinks,
-    { name: "My Events", href: "/organizer/my-events" },
-    { name: "Create Event", href: "/organizer/create-event" },
+    { name:'Dashboard',href:'/organizer/dashboard' },
+   
   ];
 
   const linksToShow =

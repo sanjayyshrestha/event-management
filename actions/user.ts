@@ -74,9 +74,8 @@ export async function getLoggedInUserId(){
 
 
 export async function getRole(){
-  const session=await auth();
-  const role=session?.user.role
-  return role;
+ const user=await getLoggedInUser();
+ return user.role
 }
 
 
