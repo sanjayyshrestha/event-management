@@ -36,6 +36,12 @@ export default function Sidebar({ role = "ADMIN" }: {
             description: "Dashboard overview",
           },
           {
+           name: "Events",
+            href: "/admin/dashboard/events",
+            icon: Users,
+            description: "Manage events",  
+          },
+          {
             name: "Users",
             href: "/admin/dashboard/users",
             icon: Users,

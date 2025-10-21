@@ -43,7 +43,7 @@ model User{
 //TODO: add more category
 model Category{
   id String @id @default(cuid())
-  name String
+  name String @unique
   createdAt DateTime @default(now())
  
   events Event[]

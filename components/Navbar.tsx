@@ -19,7 +19,7 @@ export default async function Navbar() {
   ];
 
   const adminLinks = [
-    ...baseLinks,
+
     {name:'Dashboard',href:'/admin/dashboard'},
     
   ];

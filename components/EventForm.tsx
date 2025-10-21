@@ -1,20 +1,37 @@
-'use client'
+"use client";
 import { useState, useEffect } from "react";
 import { Calendar, MapPin, Users, FileText, Tag, Loader } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 import type { Events } from "@/app/page";
 import { createEvent, updateEvent } from "@/actions/event";
 import toast from "react-hot-toast";
 import { redirect } from "next/navigation";
+import { CategoryType } from "@/app/(organizer)/organizer/dashboard/create-event/page";
 
-type Event=Events[number]
-export function EventFormPage({event}:{
-  event:Event | null
+type Event = Events[number];
+export function EventFormPage({
+  event,
+  categories,
+}: {
+  event: Event | null;
+  categories: CategoryType;
 }) {
   const [formData, setFormData] = useState({
     title: "",
@@ -22,55 +39,55 @@ export function EventFormPage({event}:{
     date: "",
     time: "",
     capacity: 50,
-    category: "conference",
+    categoryId: categories && categories.length > 0 ? categories[0].id : "",
     location: "",
   });
 
- useEffect(() => {
-  if (event) {
-    setFormData({
-      title: event.title,
-      description: event.description || "",
-      date: event.date.toISOString().split("T")[0], // "YYYY-MM-DD" for input type="date"
-      time: event.time
-        ? `${String(event.time.getHours()).padStart(2, "0")}:${String(event.time.getMinutes()).padStart(2, "0")}`
-        : "",
-      capacity: event.capacity,
-      category: event.category?.name || "conference", // use category name if available
-      location: event.location || "",
-    });
-  }
-}, [event]);
+  useEffect(() => {
+    if (event) {
+      setFormData({
+        title: event.title,
+        description: event.description || "",
+        date: event.date.toISOString().split("T")[0], // "YYYY-MM-DD" for input type="date"
+        time: event.time
+          ? `${String(event.time.getHours()).padStart(2, "0")}:${String(
+              event.time.getMinutes()
+            ).padStart(2, "0")}`
+          : "",
+        capacity: event.capacity,
+        categoryId:event.categoryId,
+        location: event.location || "",
+      });
+    }
+  }, [event]);
 
-  const [isEventCreating,setIsEventCreating]=useState(false)
-  const [isEventUpdating,setIsEventUpdating]=useState(false)
-
+  const [isEventCreating, setIsEventCreating] = useState(false);
+  const [isEventUpdating, setIsEventUpdating] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-       const fd = new FormData();
-    Object.entries(formData).forEach(([key, value]) =>
-      fd.append(key, value.toString())
-    );
-    if(!event){
-      setIsEventCreating(true)
-     
-    await createEvent(fd);
-    toast.success("Event created successfully")
-    }else{
-      setIsEventUpdating(true)
-      await updateEvent(fd,event.id)
-       toast.success("Event updated successfully")
-    }
+      const fd = new FormData();
+      Object.entries(formData).forEach(([key, value]) =>
+        fd.append(key, value.toString())
+      );
+      if (!event) {
+        setIsEventCreating(true);
+
+        await createEvent(fd);
+        toast.success("Event created successfully");
+      } else {
+        setIsEventUpdating(true);
+        await updateEvent(fd, event.id);
+        toast.success("Event updated successfully");
+      }
     } catch (error) {
-      console.log('Error creating event : ',error)
-    }finally{
-      setIsEventUpdating(false)
-      setIsEventCreating(false)
-      redirect('/')
+      console.log("Error creating event : ", error);
+    } finally {
+      setIsEventUpdating(false);
+      setIsEventCreating(false);
+      redirect("/");
     }
-    
   };
 
   const handleChange = (field: keyof Event, value: string | number) => {
@@ -83,7 +100,9 @@ export function EventFormPage({event}:{
         <div className="mb-6">
           <h1>{event ? "Edit Event" : "Create New Event"}</h1>
           <p className="text-muted-foreground">
-            {event ? "Update event details below" : "Fill in the details to create a new event"}
+            {event
+              ? "Update event details below"
+              : "Fill in the details to create a new event"}
           </p>
         </div>
 
@@ -96,7 +115,6 @@ export function EventFormPage({event}:{
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              
               {/* Title */}
               <div className="space-y-2">
                 <Label htmlFor="title" className="flex items-center gap-2">
@@ -180,19 +198,19 @@ export function EventFormPage({event}:{
                     Category
                   </Label>
                   <Select
-                    value={formData.category}
-                    onValueChange={(value) => handleChange("category", value)}
+               
+                    defaultValue={categories[0].id}
+                    onValueChange={(value) => handleChange("categoryId", value)}
                   >
                     <SelectTrigger className="bg-input-background">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="conference">Conference</SelectItem>
-                      <SelectItem value="workshop">Workshop</SelectItem>
-                      <SelectItem value="seminar">Seminar</SelectItem>
-                      <SelectItem value="networking">Networking</SelectItem>
-                      <SelectItem value="webinar">Webinar</SelectItem>
-                      <SelectItem value="meetup">Meetup</SelectItem>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -201,19 +219,21 @@ export function EventFormPage({event}:{
                     <Users className="h-4 w-4" />
                     Capacity
                   </Label>
-                 <Input
-  id="capacity"
-  type="number"
-  min="1"
-  value={formData.capacity ?? ""} // empty string if undefined
-  onChange={(e) => {
-    const value = e.target.value;
-    handleChange("capacity", value === "" ? "" : parseInt(value));
-  }}
-  required
-  className="bg-input-background"
-/>
-
+                  <Input
+                    id="capacity"
+                    type="number"
+                    min="1"
+                    value={formData.capacity ?? ""} // empty string if undefined
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      handleChange(
+                        "capacity",
+                        value === "" ? "" : parseInt(value)
+                      );
+                    }}
+                    required
+                    className="bg-input-background"
+                  />
                 </div>
               </div>
 
@@ -253,23 +273,20 @@ export function EventFormPage({event}:{
 
               {/* Actions */}
               <div className="flex flex-col-reverse sm:flex-row gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex-1"
-                
-                >
+                <Button type="button" variant="outline" className="flex-1">
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   className="flex-1 shadow-md hover:shadow-lg transition-shadow"
                 >
-{isEventCreating || isEventUpdating ? (
-    <Loader className="animate-spin h-5 w-5" />
-  ) : (
-    event ? "Update Event" : "Create Event"
-  )}
+                  {isEventCreating || isEventUpdating ? (
+                    <Loader className="animate-spin h-5 w-5" />
+                  ) : event ? (
+                    "Update Event"
+                  ) : (
+                    "Create Event"
+                  )}
                 </Button>
               </div>
             </form>
