@@ -21,42 +21,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { OrganizerDashboardInfo } from "@/app/(organizer)/organizer/dashboard/page";
+import { format } from "date-fns";
+import { formatTime } from "@/lib/formaDateTime";
 
 // Mock data — replace with real data
-const stats = [
-  {
-    title: "My Events",
-    value: "12",
-    change: "+8.3%",
-    trend: "up",
-    icon: CalendarDays,
-    description: "vs last month",
-  },
-  {
-    title: "Total Attendees",
-    value: "1,024",
-    change: "+5.7%",
-    trend: "up",
-    icon: Users,
-    description: "vs last month",
-  },
-  {
-    title: "Total Revenue",
-    value: "$18.4K",
-    change: "+12.2%",
-    trend: "up",
-    icon: DollarSign,
-    description: "from event sales",
-  },
-  {
-    title: "Avg. Rating",
-    value: "4.7",
-    change: "-0.3%",
-    trend: "down",
-    icon: Star,
-    description: "based on feedback",
-  },
-];
 
 const myEvents = [
   {
@@ -105,7 +74,29 @@ const topPerformingEvents = [
   },
 ];
 
-export default function OrganizerDashboardOverview() {
+export default function OrganizerDashboardOverview({organizerDashboardInfo}:{
+  organizerDashboardInfo:OrganizerDashboardInfo
+}) {
+const { totalEvents,totalAttendees,upcomingEvents}=organizerDashboardInfo
+  const stats = [
+  {
+    title: "My Events",
+    value: totalEvents,
+    change: "+8.3%",
+    trend: "up",
+    icon: CalendarDays,
+    description: "vs last month",
+  },
+  {
+    title: "Total Attendees",
+    value: totalAttendees,
+    change: "+5.7%",
+    trend: "up",
+    icon: Users,
+    description: "vs last month",
+  },
+];
+
   return (
     <div className="flex-1 overflow-auto bg-gray-50">
       {/* Header */}
@@ -207,23 +198,23 @@ export default function OrganizerDashboardOverview() {
             </CardHeader>
             <CardContent className="p-0">
               <div className="divide-y divide-gray-100">
-                {myEvents.map((event) => (
+                {upcomingEvents.map((event) => (
                   <div
                     key={event.id}
                     className="px-6 py-4 hover:bg-gray-50 transition-colors group flex items-center justify-between"
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 mb-1 truncate">
-                        {event.name}
+                        {event.title}
                       </p>
                       <div className="flex items-center gap-4 text-xs text-gray-500 mb-1">
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
-                          {event.date}
+                        {format(new Date(event.date), "MMM dd, yyyy")}
                         </span>
                         <span className="flex items-center gap-1">
                           <Clock className="w-3 h-3" />
-                          {event.time}
+                         {event.time ? formatTime(String(event.time)) : ""}
                         </span>
                       </div>
                       <div className="flex items-center gap-1 text-xs text-gray-500">
@@ -233,11 +224,9 @@ export default function OrganizerDashboardOverview() {
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="text-right">
-                        <p className="text-sm font-semibold text-gray-900">
-                          {event.revenue}
-                        </p>
+                
                         <p className="text-xs text-gray-500">
-                          {event.attendees} attendees
+                          {event._count.bookings} attendees
                         </p>
                       </div>
                       <DropdownMenu>

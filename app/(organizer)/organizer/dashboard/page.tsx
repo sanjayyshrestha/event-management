@@ -1,10 +1,14 @@
+import { getDataForOrganizerDashboard } from '@/actions/organizer.action'
 import OrganizerDashboardOverview from '@/components/OrganizerDashboardOverview'
 import React from 'react'
 
-const Home = () => {
+export type OrganizerDashboardInfo=Awaited<ReturnType <typeof getDataForOrganizerDashboard>>
+const Home = async () => {
+  
+  const organizerDashboardInfo=await getDataForOrganizerDashboard()
   return (
     <div>
-      <OrganizerDashboardOverview/>
+        <OrganizerDashboardOverview organizerDashboardInfo={organizerDashboardInfo}/>
     </div>
   )
 }

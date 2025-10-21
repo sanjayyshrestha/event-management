@@ -12,6 +12,7 @@ import {
   ChevronRight,
   Menu,
   ClipboardList,
+  CheckCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -72,6 +73,12 @@ export default function Sidebar({ role = "ADMIN" }: {
             icon: ClipboardList,
             description: "View your event bookings",
           },
+          {
+  name: "Pending Approvals",
+  href: "/organizer/dashboard/user-bookings",
+  icon: CheckCircle2,
+  description: "Approve or reject attendee requests",
+},
           {
             name: "Create Event",
             href: "/organizer/dashboard/create-event",
