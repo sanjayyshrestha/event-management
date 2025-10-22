@@ -16,16 +16,39 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Role } from "@/types/status";
 
-export default function Sidebar({ role = "ADMIN" }: {
-  role:Role
-}) {
+type SidebarProps = {
+  role?: Role;
+  onLogout?: () => void;
+};
+
+export default function Sidebar({ role = "ADMIN", onLogout }: SidebarProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  // ✅ Role-based nav link definitions
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    if (open) {
+      document.body.style.overflow = "hidden";
+      window.addEventListener("keydown", onKey);
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  // Role-based nav link definitions
   const navLinks =
     role === "ADMIN"
       ? [
@@ -36,10 +59,10 @@ export default function Sidebar({ role = "ADMIN" }: {
             description: "Dashboard overview",
           },
           {
-           name: "Events",
+            name: "Events",
             href: "/admin/dashboard/events",
             icon: Users,
-            description: "Manage events",  
+            description: "Manage events",
           },
           {
             name: "Users",
@@ -80,11 +103,11 @@ export default function Sidebar({ role = "ADMIN" }: {
             description: "View your event bookings",
           },
           {
-  name: "Pending Approvals",
-  href: "/organizer/dashboard/user-bookings",
-  icon: CheckCircle2,
-  description: "Approve or reject attendee requests",
-},
+            name: "Pending Approvals",
+            href: "/organizer/dashboard/user-bookings",
+            icon: CheckCircle2,
+            description: "Approve or reject attendee requests",
+          },
           {
             name: "Create Event",
             href: "/organizer/dashboard/create-event",
@@ -93,77 +116,110 @@ export default function Sidebar({ role = "ADMIN" }: {
           },
         ];
 
-  const isActive = (href: string) =>
-    href === "/admin/dashboard" || "/organizer/dashboard" ? pathname === href : pathname.startsWith(href);
+  const isActive = (href: string) => {
+    if (!pathname) return false;
+
+    if (href === "/admin/dashboard" || href === "/organizer/dashboard") {
+      return pathname === href;
+    }
+
+    return pathname === href || pathname.startsWith(href + "/");
+  };
+
+  const handleLogout = () => {
+    if (onLogout) return onLogout();
+    console.log(
+      "Logout clicked — implement onLogout prop to perform real logout"
+    );
+  };
 
   return (
     <>
-      {/* 🔹 Mobile Toggle */}
+      {/* Mobile Menu Button */}
       <Button
         variant="outline"
         size="icon"
-        className="fixed top-4 left-4 z-50 lg:hidden"
+        className="fixed top-4 left-4 z-[60] lg:hidden"
         onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        aria-label="Toggle sidebar"
       >
         <Menu className="w-5 h-5" />
       </Button>
 
-      {/* 🔹 Sidebar */}
+      {/* Sidebar - Fixed on mobile, Sticky on desktop */}
       <aside
+        aria-hidden={!open && "true"}
         className={cn(
-          "fixed lg:static top-0 left-0 z-40 h-screen w-64 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300",
-          open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          // Mobile: Fixed positioning with slide animation
+          "fixed inset-y-0 left-0 z-50 transform transition-transform duration-300",
+          "lg:transform-none", // Remove transform on desktop
+          
+          // Desktop: Sticky positioning
+          "lg:sticky lg:top-0 lg:left-auto lg:z-40",
+          "lg:h-screen", // Full viewport height on desktop
+          
+          // Common styles
+          "flex flex-col bg-white border-r border-gray-200",
+          "w-[min(92vw,20rem)] lg:w-64",
+
+          // Mobile slide animation
+          open
+            ? "translate-x-0 shadow-lg lg:shadow-none"
+            : "-translate-x-full lg:translate-x-0"
         )}
+        role="navigation"
       >
-        {/* Header */}
-        <div className="p-6 pb-4 border-b border-gray-100">
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center">
+        <div className="p-6 pb-4 border-b border-gray-100 flex-shrink-0 min-w-0">
+          <div className="flex items-center gap-2 mb-1 min-w-0">
+            <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center flex-shrink-0">
               <LayoutDashboard className="w-4 h-4 text-white" />
             </div>
-            <h1 className="text-lg font-semibold text-gray-900 capitalize">
+            <h1 className="text-lg font-semibold text-gray-900 capitalize truncate">
               {role} Panel
             </h1>
           </div>
-          <p className="text-xs text-gray-500 ml-10">
+          <p className="text-xs text-gray-500 ml-10 truncate">
             Manage your {role === "ADMIN" ? "platform" : "events"}
           </p>
         </div>
 
-        <Separator className="mb-2" />
+        <Separator className="mb-2 flex-shrink-0" />
 
-        {/* Navigation */}
-        <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto overscroll-contain">
           {navLinks.map((link) => {
             const Icon = link.icon;
             const active = isActive(link.href);
 
             return (
-              <Link key={link.name} href={link.href} onClick={() => setOpen(false)}>
+              <Link
+                key={link.name}
+                href={link.href}
+                onClick={() => setOpen(false)}
+                className="block"
+                aria-current={active ? "page" : undefined}
+              >
                 <div
                   className={cn(
-                    "group relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 cursor-pointer",
+                    "group relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
                     active
                       ? "bg-gray-900 text-white shadow-sm"
                       : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                   )}
                 >
-                  {/* Active indicator */}
                   {active && (
                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full" />
                   )}
 
-                  {/* Icon */}
                   <Icon
                     className={cn(
-                      "w-5 h-5 transition-all duration-200",
+                      "w-5 h-5 transition-all duration-200 flex-shrink-0",
                       active
                         ? "text-white"
                         : "text-gray-400 group-hover:text-gray-600"
                     )}
                   />
 
-                  {/* Text */}
                   <div className="flex-1 min-w-0">
                     <div
                       className={cn(
@@ -185,7 +241,6 @@ export default function Sidebar({ role = "ADMIN" }: {
                     </div>
                   </div>
 
-                  {/* Arrow */}
                   <ChevronRight
                     className={cn(
                       "w-4 h-4 transition-all duration-200",
@@ -200,12 +255,11 @@ export default function Sidebar({ role = "ADMIN" }: {
           })}
         </nav>
 
-        {/* Footer */}
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-gray-200 flex-shrink-0">
           <Button
             variant="ghost"
             className="w-full justify-start gap-3 text-gray-700 hover:text-red-600 hover:bg-red-50 transition-colors"
-            onClick={() => console.log("Logout clicked")}
+            onClick={handleLogout}
           >
             <LogOut className="w-5 h-5" />
             <span className="text-sm font-medium">Logout</span>
@@ -232,11 +286,12 @@ export default function Sidebar({ role = "ADMIN" }: {
         </div>
       </aside>
 
-      {/* Overlay for mobile */}
+      {/* Mobile Overlay */}
       {open && (
         <div
-          className="fixed inset-0 bg-black/30 backdrop-blur-sm lg:hidden z-30"
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm lg:hidden z-40"
           onClick={() => setOpen(false)}
+          aria-hidden
         />
       )}
     </>

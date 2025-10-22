@@ -3,13 +3,14 @@
 import React, { useState } from "react";
 import { Menu, X, User } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "./ui/button";
 import { signout } from "@/actions/user";
-
 
 interface MobileNavProps {
   user?: {
     name?: string;
+    image?: string;
     role?: "ADMIN" | "USER" | "ORGANIZER";
   } | null;
 }
@@ -17,19 +18,13 @@ interface MobileNavProps {
 export default function MobileNav({ user }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
 
+  // ✅ Consistent navigation links
   const baseLinks = [{ name: "Events", href: "/" }];
   const userLinks = [...baseLinks, { name: "My Bookings", href: "/my-bookings" }];
-  const adminLinks = [
-    ...baseLinks,
-    {name:'User bookings',href:'/user-bookings'},
-    { name: "User Management", href: "/users" },
-    { name: "Create Event", href: "/create-event" },
-  ];
+  const adminLinks = [{ name: "Dashboard", href: "/admin/dashboard" }];
   const organizerLinks = [
     ...baseLinks,
-    
-    { name: "My Events", href: "/organizer/my-events" },
-    { name: "Create Event", href: "/organizer/create-event" },
+    { name: "Dashboard", href: "/organizer/dashboard" },
   ];
 
   const linksToShow =
@@ -41,14 +36,6 @@ export default function MobileNav({ user }: MobileNavProps) {
       ? userLinks
       : baseLinks;
 
-      const handleSignOut=async()=>{
-        try {
-          console.log('sign out button is clicked')
-          await signout()
-        } catch (error) {
-          console.log('Error in sign out : ',error)
-        }
-      }
   return (
     <>
       {/* Mobile Menu Button */}
@@ -80,32 +67,36 @@ export default function MobileNav({ user }: MobileNavProps) {
               </Link>
             ))}
 
-            {/* Divider */}
             <div className="border-t border-gray-200 my-3"></div>
 
             {/* User Section */}
             {user ? (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center">
-                    <User className="w-5 h-5 text-white" />
+                  <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center overflow-hidden">
+                    {user.image ? (
+                      <Image
+                        src={user.image}
+                        alt="User avatar"
+                        width={40}
+                        height={40}
+                        className="object-cover rounded-full"
+                      />
+                    ) : (
+                      <User className="w-5 h-5 text-white" />
+                    )}
                   </div>
                   <span className="text-sm font-medium text-gray-900">
                     {user.name || "User"}
                   </span>
                 </div>
 
-                {/* Sign Out Button */}
-                {/* TODO: better approach to handle logout if any */}
-                <form action={async()=>{
-                  await signout()
-
-                }}>
+                {/* ✅ Consistent Logout Form */}
+                <form action={signout}>
                   <Button
                     size="sm"
                     variant="outline"
                     type="submit"
-                    
                     className="text-gray-700 hover:bg-gray-100"
                   >
                     Sign Out
